@@ -39,6 +39,9 @@
                     selectDiv.style.display = 'inline-block';
                     selectDiv.style.width = 'auto';
 
+                    // Retrieve selected option from local storage
+                    var selectedOption = localStorage.getItem('selectedOption');
+
                     // Iterate over each option in the menu
                     for (var i = 0; i < optionsMenu.children.length; i++) {
                         var option = optionsMenu.children[i];
@@ -47,6 +50,11 @@
                         var selectOption = document.createElement('option');
                         selectOption.textContent = option.textContent.trim();
                         selectOption.value = option.firstElementChild.href;
+
+                        // If the current option was previously selected, select it
+                        if (selectedOption === selectOption.value) {
+                            selectOption.selected = true;
+                        }
 
                         // Add the option to the select
                         select.appendChild(selectOption);
@@ -57,6 +65,8 @@
 
                     // Add event listener to change location on selection
                     select.addEventListener('change', function() {
+                        // Save selected option to local storage
+                        localStorage.setItem('selectedOption', this.value);
                         window.location.href = this.value;
                     });
 
