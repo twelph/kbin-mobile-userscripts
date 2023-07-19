@@ -12,73 +12,26 @@
 // @grant        none
 // ==/UserScript==
 
+// Anonymous function to avoid global namespace pollution
 (() => {
-  let isFound = false;
+  let optionFound = false;
 
+  // Utilize MutationObserver to watch for changes in the DOM
   const observer = new MutationObserver((mutations) => {
-    if (isFound) return;
+    if (optionFound) return;
 
     mutations.some((mutation) => {
       const { addedNodes } = mutation;
 
       if (!addedNodes.length) return false;
 
-      const menu = document.querySelector('.options__main');
+      const menuElement = document.querySelector('.options__main');
 
-      if (!menu) return false;
+      if (!menuElement) return false;
 
-      isFound = true;
+      optionFound = true;
 
-      const select = document.createElement('select');
-      select.className = 'options__main dropdown';
-      select.style.border = 'none';
-
-      const bodyStyle = getComputedStyle(document.body);
-      select.style.backgroundColor = bodyStyle.backgroundColor;
-      select.style.color = bodyStyle.color;
-
-      const div = document.createElement('div');
-      const selected = localStorage.getItem('selectedOption');
-      const children = Array.from(menu.children);
-
-      const isActive = children.some((option) => {
-        const child = option.firstElementChild;
-        return child.classList.contains('active') || selected === child.href;
-      });
-
-      const options = [];
-
-      if (!isActive) {
-        const defaultOption = document.createElement('option');
-        defaultOption.textContent = 'Select';
-        defaultOption.value = '';
-        options.push(defaultOption);
-      }
-
-      children.forEach((option) => {
-        const opt = document.createElement('option');
-        const child = option.firstElementChild;
-        opt.textContent = option.textContent.trim();
-        opt.value = child.href;
-        opt.selected = child.classList.contains('active') || selected === opt.value;
-        options.push(opt);
-      });
-
-      options.forEach((option) => select.append(option));
-
-      div.append(select);
-      div.style.display = 'inline-block';
-      div.style.width = 'auto';
-      menu.parentNode.replaceChild(div, menu);
-
-      select.addEventListener('change', function eventListener() {
-        localStorage.setItem('selectedOption', this.value);
-        window.location.href = this.value;
-      });
-
-      const scroll = document.querySelector('.scroll');
-
-      if (scroll) scroll.remove();
+      createDropdownMenu(menuElement);
 
       observer.disconnect();
 
@@ -87,4 +40,105 @@
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
+
+  /**
+   * Function to create a dropdown menu
+   *
+   * @param {Element} menuElement - The menu element to replace with a dropdown
+   */
+  function createDropdownMenu(menuElement) {
+    const dropdown = document.createElement('select');
+    dropdown.className = 'options__main dropdown';
+    dropdown.style.border = 'none';
+
+    const bodyStyle = getComputedStyle(document.body);
+    dropdown.style.backgroundColor = bodyStyle.backgroundColor;
+    dropdown.style.color = bodyStyle.color;
+
+    const dropdownContainer = document.createElement('div');
+    const selectedOption = localStorage.getItem('selectedOption');
+    const menuOptions = Array.from(menuElement.children);
+
+    // Check if any option is active
+    const isActive = menuOptions.some((option) => {
+      const childElement = option.firstElementChild;
+      return childElement.classList.contains('active') || selectedOption === childElement.href;
+    });
+
+    const optionElements = [];
+
+    if (!isActive) {
+      const defaultOption = document.createElement('option');
+      defaultOption.textContent = 'Select';
+      defaultOption.value = '';
+      optionElements.push(defaultOption);
+    }
+
+    menuOptions.forEach((option) => {
+      const optionElement = createOptionElement(option);
+      optionElements.push(optionElement);
+    });
+
+    optionElements.forEach((option) => dropdown.append(option));
+
+    dropdownContainer.append(dropdown);
+    dropdownContainer.style.display = 'inline-block';
+    dropdownContainer.style.width = 'auto';
+    menuElement.parentNode.replaceChild(dropdownContainer, menuElement);
+
+    dropdown.addEventListener('change', handleOptionChange);
+
+    const scrollElement = document.querySelector('.scroll');
+
+    if (scrollElement) scrollElement.remove();
+  }
+
+  /**
+   * Function to create an option element
+   *
+   * @param {Element} option - The option to create an element for
+   * @returns {Element} The created option element
+   */
+  function createOptionElement(option) {
+    const optionElement = document.createElement('option');
+    const childElement = option.firstElementChild;
+    const selectedOption = localStorage.getItem('selectedOption');
+    optionElement.textContent = option.textContent.trim();
+    optionElement.value = childElement.href;
+    optionElement.selected = childElement.classList.contains('active') || selectedOption === optionElement.value;
+    return optionElement;
+  }
+
+  /**
+   * Event handler for option change
+   *
+   * @param {Event} event - The change event
+   */
+  function handleOptionChange(event) {
+    localStorage.setItem('selectedOption', event.target.value);
+    window.location.href = event.target.value;
+    this.classList.add('animate');
+    setTimeout(() => this.classList.remove('animate'), 600);
+  }
 })();
+
+// Define style for the animation
+const style = document.createElement('style');
+style.innerHTML = `
+  .animate {
+    animation: pulse 0.6s;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+`;
+document.head.appendChild(style);
