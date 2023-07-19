@@ -15,5 +15,3 @@ function hideChangeViewButton(toggle) {
     btn.style.display = toggle ? 'none' : 'block';
   }
 }
-
-hideChangeViewButton(true);
