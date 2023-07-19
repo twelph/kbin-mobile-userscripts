@@ -12,15 +12,15 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
-    'use strict';
-
-    window.addEventListener('load', function() {
-        var filterDropdown = document.querySelector('button[aria-label="Filter by type"]').parentNode;
-        if (filterDropdown) {
-            filterDropdown.parentNode.removeChild(filterDropdown);
+function hideFilterByTimeButton(toggle) {
+    var btn = document.querySelector('button[aria-label="Filter by time"]');
+    if (btn) {
+        if (toggle) {
+            btn.style.display = 'none';
+        } else {
+            btn.style.display = 'block';
         }
-    }, false);
+    }
+}
 
-})();
-
+hideFilterByTimeButton(true);
