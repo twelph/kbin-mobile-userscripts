@@ -15,16 +15,11 @@
 (function() {
     'use strict';
 
-    const observer = new MutationObserver((mutationsList, observer) => {
-        for(let mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                const optionsLayout = document.querySelector('.options__layout');
-                if (optionsLayout) {
-                    optionsLayout.parentNode.removeChild(optionsLayout);
-                }
-            }
+    window.addEventListener('load', function() {
+        const optionsLayout = document.querySelector('.options__layout');
+        if (optionsLayout) {
+            optionsLayout.parentNode.removeChild(optionsLayout);
         }
-    });
+    }, false);
 
-    observer.observe(document.body, { childList: true, subtree: true });
 })();
