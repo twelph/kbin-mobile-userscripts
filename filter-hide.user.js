@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         kbin filter hider
 // @namespace    https://github.com/twelph/kbin-mobile-userscripts/
-// @version      1
+// @version      0.1
 // @description  Hide filter by time button
 // @author       Twelph
 // @match        https://kbin.social/*
@@ -15,5 +15,3 @@ function hideFilterButton(toggle) {
     btn.style.display = toggle ? 'none' : 'block';
   }
 }
-
-hideFilterButton(true);
