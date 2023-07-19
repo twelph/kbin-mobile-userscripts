@@ -5,11 +5,7 @@
 // @description  Hide the change view button
 // @author       Twelph
 // @match        https://kbin.social/*
-// @match        https://lab2.kbin.pub/*
-// @match        https://lab3.kbin.pub/*
-// @match        https://fedia.io/*
-// @match        https://karab.in/*
-// @grant        none
+// @license      MIT
 // ==/UserScript==
 
 function hideChangeViewButton(toggle) {
