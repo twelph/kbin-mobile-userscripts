@@ -13,91 +13,78 @@
 // ==/UserScript==
 
 (() => {
-  let foundMenu = false;
+  let isFound = false;
 
-  const observer = new MutationObserver((mutationsList) => {
-    if (foundMenu) return;
+  const observer = new MutationObserver((mutations) => {
+    if (isFound) return;
 
-    for(const mutation of mutationsList) {
-      if (mutation.type !== 'childList' || !mutation.addedNodes.length) continue;
+    mutations.some((mutation) => {
+      const { addedNodes } = mutation;
 
-      const menuElement = document.querySelector('.options__main');
-      if (!menuElement) continue;
+      if (!addedNodes.length) return false;
 
-      foundMenu = true;
+      const menu = document.querySelector('.options__main');
 
-      const selectElement = createSelectElement(menuElement);
-      const divElement = createDivElement(selectElement);
+      if (!menu) return false;
 
-      menuElement.parentNode.replaceChild(divElement, menuElement);
-      
-      removeScrollElement();
+      isFound = true;
+
+      const select = document.createElement('select');
+      select.className = 'options__main dropdown';
+      select.style.border = 'none';
+
+      const bodyStyle = getComputedStyle(document.body);
+      select.style.backgroundColor = bodyStyle.backgroundColor;
+      select.style.color = bodyStyle.color;
+
+      const div = document.createElement('div');
+      const selected = localStorage.getItem('selectedOption');
+      const children = Array.from(menu.children);
+
+      const isActive = children.some((option) => {
+        const child = option.firstElementChild;
+        return child.classList.contains('active') || selected === child.href;
+      });
+
+      const options = [];
+
+      if (!isActive) {
+        const defaultOption = document.createElement('option');
+        defaultOption.textContent = 'Select';
+        defaultOption.value = '';
+        options.push(defaultOption);
+      }
+
+      children.forEach((option) => {
+        const opt = document.createElement('option');
+        const child = option.firstElementChild;
+        opt.textContent = option.textContent.trim();
+        opt.value = child.href;
+        opt.selected = child.classList.contains('active') || selected === opt.value;
+        options.push(opt);
+      });
+
+      options.forEach((option) => select.append(option));
+
+      div.append(select);
+      div.style.display = 'inline-block';
+      div.style.width = 'auto';
+      menu.parentNode.replaceChild(div, menu);
+
+      select.addEventListener('change', function eventListener() {
+        localStorage.setItem('selectedOption', this.value);
+        window.location.href = this.value;
+      });
+
+      const scroll = document.querySelector('.scroll');
+
+      if (scroll) scroll.remove();
 
       observer.disconnect();
-      break;
-    }
+
+      return true;
+    });
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
-
-  function createSelectElement(menuElement) {
-    const selectElement = document.createElement('select');
-    selectElement.className = 'options__main dropdown';
-    selectElement.style.border = 'none';
-
-    const bodyStyle = getComputedStyle(document.body);
-    selectElement.style.backgroundColor = bodyStyle.backgroundColor;
-    selectElement.style.color = bodyStyle.color;
-
-    const selectedOption = localStorage.getItem('selectedOption');
-    const menuChildren = Array.from(menuElement.children);
-    const isActive = menuChildren.some((option) => {
-      const child = option.firstElementChild;
-      return child.classList.contains('active') || selectedOption === child.href;
-    });
-
-    const options = [];
-    if (!isActive) {
-      const defaultOption = document.createElement('option');
-      defaultOption.textContent = 'Select';
-      defaultOption.value = '';
-      options.push(defaultOption);
-    }
-
-    menuChildren.forEach((option) => {
-      const opt = document.createElement('option');
-      const child = option.firstElementChild;
-      opt.textContent = option.textContent.trim();
-      opt.value = child.href;
-      opt.selected = child.classList.contains('active') || selectedOption === opt.value;
-      options.push(opt);
-    });
-
-    options.forEach((option) => selectElement.append(option));
-
-    selectElement.addEventListener('change', function () {
-      localStorage.setItem('selectedOption', this.value);
-      window.location.href = this.value;
-    });
-
-    return selectElement;
-  }
-
-  function createDivElement(selectElement) {
-    const divElement = document.createElement('div');
-    divElement.append(selectElement);
-    divElement.style.display = 'inline-block';
-    divElement.style.width = 'auto';
-    return divElement;
-  }
-
-  function removeScrollElement() {
-    const scrollElement = document.querySelector('.scroll');
-    if (scrollElement) scrollElement.remove();
-  }
-
-})();
-
-  observer.observe(document.body, { childList: true, subtree: true });
-
 })();
