@@ -15,16 +15,12 @@
 (function() {
     'use strict';
 
-    const observer = new MutationObserver((mutationsList, observer) => {
-        for(let mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                var filterDropdown = document.querySelector('button[aria-label="Filter by type"]').parentNode;
-                if (filterDropdown) {
-                    filterDropdown.parentNode.removeChild(filterDropdown);
-                }
-            }
+    window.addEventListener('load', function() {
+        var filterDropdown = document.querySelector('button[aria-label="Filter by type"]').parentNode;
+        if (filterDropdown) {
+            filterDropdown.parentNode.removeChild(filterDropdown);
         }
-    });
+    }, false);
 
-    observer.observe(document.body, { childList: true, subtree: true });
 })();
+
