@@ -15,11 +15,15 @@
 (function() {
     'use strict';
 
-    window.addEventListener('load', function() {
+    // This function toggles the visibility of options layout
+    window.toggleOptionsLayout = function(toggle) {
         const optionsLayout = document.querySelector('.options__layout');
         if (optionsLayout) {
-            optionsLayout.parentNode.removeChild(optionsLayout);
+            if (toggle) {
+                optionsLayout.style.display = 'none';
+            } else {
+                optionsLayout.style.display = 'block';
+            }
         }
-    }, false);
-
+    }
 })();
