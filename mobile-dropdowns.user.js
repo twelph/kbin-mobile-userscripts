@@ -12,45 +12,91 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
-  'use strict';
+(() => {
+  let foundMenu = false;
 
-  const observer = new MutationObserver(mutations => {
-    mutations.some(mutation => {
-      if (!mutation.addedNodes.length) return;
-      const optionsMenu = document.querySelector('.options__main');
-      if (!optionsMenu) return;
+  const observer = new MutationObserver((mutationsList) => {
+    if (foundMenu) return;
 
-      const select = document.createElement('select');
-      select.className = 'options__main dropdown';
-      select.style.border = 'none';
+    for(const mutation of mutationsList) {
+      if (mutation.type !== 'childList' || !mutation.addedNodes.length) continue;
 
-      const selectDiv = document.createElement('div');
-      selectDiv.append(select);
-      selectDiv.style.display = 'inline-block';
-      selectDiv.style.width = 'auto';
+      const menuElement = document.querySelector('.options__main');
+      if (!menuElement) continue;
 
-      const selectedOption = localStorage.getItem('selectedOption');
+      foundMenu = true;
 
-      Array.from(optionsMenu.children).forEach(option => {
-        const selectOption = document.createElement('option');
-        selectOption.textContent = option.textContent.trim();
-        selectOption.value = option.firstElementChild.href;
-        selectOption.selected = option.firstElementChild.classList.contains('active') || selectedOption === selectOption.value;
-        select.append(selectOption);
-      });
+      const selectElement = createSelectElement(menuElement);
+      const divElement = createDivElement(selectElement);
 
-      optionsMenu.parentNode.replaceChild(selectDiv, optionsMenu);
-
-      select.addEventListener('change', function() {
-        localStorage.setItem('selectedOption', this.value);
-        window.location.href = this.value;
-      });
+      menuElement.parentNode.replaceChild(divElement, menuElement);
+      
+      removeScrollElement();
 
       observer.disconnect();
-      return true;
-    });
+      break;
+    }
   });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  function createSelectElement(menuElement) {
+    const selectElement = document.createElement('select');
+    selectElement.className = 'options__main dropdown';
+    selectElement.style.border = 'none';
+
+    const bodyStyle = getComputedStyle(document.body);
+    selectElement.style.backgroundColor = bodyStyle.backgroundColor;
+    selectElement.style.color = bodyStyle.color;
+
+    const selectedOption = localStorage.getItem('selectedOption');
+    const menuChildren = Array.from(menuElement.children);
+    const isActive = menuChildren.some((option) => {
+      const child = option.firstElementChild;
+      return child.classList.contains('active') || selectedOption === child.href;
+    });
+
+    const options = [];
+    if (!isActive) {
+      const defaultOption = document.createElement('option');
+      defaultOption.textContent = 'Select';
+      defaultOption.value = '';
+      options.push(defaultOption);
+    }
+
+    menuChildren.forEach((option) => {
+      const opt = document.createElement('option');
+      const child = option.firstElementChild;
+      opt.textContent = option.textContent.trim();
+      opt.value = child.href;
+      opt.selected = child.classList.contains('active') || selectedOption === opt.value;
+      options.push(opt);
+    });
+
+    options.forEach((option) => selectElement.append(option));
+
+    selectElement.addEventListener('change', function () {
+      localStorage.setItem('selectedOption', this.value);
+      window.location.href = this.value;
+    });
+
+    return selectElement;
+  }
+
+  function createDivElement(selectElement) {
+    const divElement = document.createElement('div');
+    divElement.append(selectElement);
+    divElement.style.display = 'inline-block';
+    divElement.style.width = 'auto';
+    return divElement;
+  }
+
+  function removeScrollElement() {
+    const scrollElement = document.querySelector('.scroll');
+    if (scrollElement) scrollElement.remove();
+  }
+
+})();
 
   observer.observe(document.body, { childList: true, subtree: true });
 
