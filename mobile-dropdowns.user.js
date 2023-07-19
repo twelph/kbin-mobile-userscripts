@@ -117,28 +117,5 @@
   function handleOptionChange(event) {
     localStorage.setItem('selectedOption', event.target.value);
     window.location.href = event.target.value;
-    this.classList.add('animate');
-    setTimeout(() => this.classList.remove('animate'), 600);
   }
 })();
-
-// Define style for the animation
-const style = document.createElement('style');
-style.innerHTML = `
-  .animate {
-    animation: pulse 0.6s;
-  }
-
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-`;
-document.head.appendChild(style);
