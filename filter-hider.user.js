@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Remove Filter Dropdown
+// @name         kbin filter hider
 // @namespace    https://github.com/twelph/kbin-mobile-userscripts/
 // @version      1
-// @description  Remove the filter dropdown from kbin.social
+// @description  Hide filter by time button
 // @author       Twelph
 // @match        https://kbin.social/*
 // @match        https://lab2.kbin.pub/*
