@@ -13,14 +13,11 @@
 // ==/UserScript==
 
 function hideFilterByTimeButton(toggle) {
-    var btn = document.querySelector('button[aria-label="Filter by time"]');
-    if (btn) {
-        if (toggle) {
-            btn.style.display = 'none';
-        } else {
-            btn.style.display = 'block';
-        }
-    }
+  const btn = document.querySelector('button[aria-label="Filter by time"]');
+
+  if (btn) {
+    btn.style.display = toggle ? 'none' : 'block';
+  }
 }
 
 hideFilterByTimeButton(true);
