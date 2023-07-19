@@ -15,15 +15,16 @@
 // Anonymous function to avoid global namespace pollution
 (() => {
   let optionFound = false;
+  let scrollElementFound = false;
 
-  // Add a style element to hide the original menu initially
+  // Add a style element to hide the original menu and scroll element initially
   const styleElement = document.createElement('style');
-  styleElement.innerHTML = '.options__main { display: none; }';
+  styleElement.innerHTML = '.options__main, .scroll { display: none; }';
   document.head.appendChild(styleElement);
 
   // Utilize MutationObserver to watch for changes in the DOM
   const observer = new MutationObserver((mutations) => {
-    if (optionFound) return;
+    if (optionFound && scrollElementFound) return;
 
     mutations.some((mutation) => {
       const { addedNodes } = mutation;
@@ -31,17 +32,25 @@
       if (!addedNodes.length) return false;
 
       const menuElement = document.querySelector('.options__main');
+      const scrollElement = document.querySelector('.scroll');
 
-      if (!menuElement) return false;
+      if (!menuElement && !scrollElement) return false;
 
-      optionFound = true;
+      if (menuElement && !optionFound) {
+        optionFound = true;
+        createDropdownMenu(menuElement);
+      }
 
-      createDropdownMenu(menuElement);
+      if (scrollElement && !scrollElementFound) {
+        scrollElementFound = true;
+        scrollElement.style.display = 'none';
+      }
 
-      // Remove the style element to unhide the dropdown
-      styleElement.parentNode.removeChild(styleElement);
-
-      observer.disconnect();
+      if (optionFound) {
+        // Remove the style element to unhide the dropdown
+        styleElement.parentNode.removeChild(styleElement);
+        observer.disconnect();
+      }
 
       return true;
     });
