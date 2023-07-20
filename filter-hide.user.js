@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 function hideFilterButton(toggle) {
-  let btn = document.querySelector('button[aria-label="Filter by time"]');
+  let btn = document.querySelector('button[aria-label="Filter by type"]');
 
   if (btn) {
     btn.style.display = toggle ? 'none' : 'block';
