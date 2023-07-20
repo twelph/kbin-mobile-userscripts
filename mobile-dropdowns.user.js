@@ -13,84 +13,63 @@
 // ==/UserScript==
 
 (() => {
-  let optionFound = false, scrollElementFound = false;
-  const styleElement = document.createElement('style');
-  styleElement.innerHTML = '.options__main, .scroll { display: none; }';
-  document.head.appendChild(styleElement);
+  // Select the main options element
+  const mainOptions = document.querySelector('.options__main');
+  if (!mainOptions) return;
 
-  const observer = new MutationObserver((mutations) => {
-    if (optionFound && scrollElementFound) return;
-    mutations.some((mutation) => {
-      const { addedNodes } = mutation;
-      if (!addedNodes.length) return false;
-      const menuElement = document.querySelector('.options__main');
-      const scrollElement = document.querySelector('.scroll');
-      if (!menuElement && !scrollElement) return false;
-      if (menuElement && !optionFound) {
-        optionFound = true;
-        createDropdownMenu(menuElement);
-      }
-      if (scrollElement && !scrollElementFound) {
-        scrollElementFound = true;
-        scrollElement.style.display = 'none';
-      }
-      if (optionFound) {
-        styleElement.parentNode.removeChild(styleElement);
-        observer.disconnect();
-      }
-      return true;
-    });
-  });
+  // Get the styles of the parent element
+  const parentStyles = getComputedStyle(mainOptions.parentElement);
 
-  observer.observe(document.body, { childList: true, subtree: true });
+  // Create a new select element
+  const selectElement = createSelectElement(parentStyles);
 
-  function createDropdownMenu(menuElement) {
-    const dropdown = document.createElement('select');
-    dropdown.className = 'options__main dropdown';
-    dropdown.style.border = 'none';
-    const bodyStyle = getComputedStyle(document.body);
-    dropdown.style.backgroundColor = bodyStyle.backgroundColor;
-    dropdown.style.color = bodyStyle.color;
-    const dropdownContainer = document.createElement('div');
-    const selectedOption = localStorage.getItem('selectedOption');
-    const menuOptions = Array.from(menuElement.children);
-    const isActive = menuOptions.some((option) => {
-      const childElement = option.firstElementChild;
-      return childElement.classList.contains('active') || selectedOption === childElement.href;
-    });
-    const optionElements = [];
-    if (!isActive) {
-      const defaultOption = document.createElement('option');
-      defaultOption.textContent = 'Select';
-      defaultOption.value = '';
-      optionElements.push(defaultOption);
-    }
-    menuOptions.forEach((option) => {
-      const optionElement = createOptionElement(option);
-      optionElements.push(optionElement);
-    });
-    optionElements.forEach((option) => dropdown.append(option));
-    dropdownContainer.append(dropdown);
-    dropdownContainer.style.display = 'inline-block';
-    dropdownContainer.style.width = 'auto';
-    menuElement.parentNode.replaceChild(dropdownContainer, menuElement);
-    dropdown.addEventListener('change', handleOptionChange);
-    const scrollElement = document.querySelector('.scroll');
-    if (scrollElement) scrollElement.remove();
-  }
+  // Add options to the select element
+  addOptionsToSelect(mainOptions, selectElement);
 
-  function createOptionElement(option) {
-    const optionElement = document.createElement('option');
-    const childElement = option.firstElementChild;
-    const selectedOption = localStorage.getItem('selectedOption');
-    optionElement.textContent = option.textContent.trim();
-    optionElement.value = childElement.href;
-    optionElement.selected = childElement.classList.contains('active') || selectedOption === optionElement.value;
-    return optionElement;
-  }
+  // Handle select element change event
+  selectElement.onchange = handleSelectChange;
 
-  function handleOptionChange(event) {
-    localStorage.setItem('selectedOption', event.target.value);
-    window.location.href = event.target.value;
-  }
+  // Replace the main options with the new select element
+  replaceMainOptionsWithSelect(mainOptions, selectElement);
+
+  // Hide the scroll element if present
+  hideScrollElement();
 })();
+
+// Function to create a select element
+function createSelectElement(parentStyles) {
+  const selectElement = document.createElement('select');
+  selectElement.className = 'options__main dropdown';
+  selectElement.style.cssText = `border:none;background-color:${parentStyles.backgroundColor};color:${parentStyles.color};`;
+  return selectElement;
+}
+
+// Function to add options to the select element
+function addOptionsToSelect(mainOptions, selectElement) {
+  Array.from(mainOptions.children).forEach((option) => {
+    const newOption = document.createElement('option');
+    newOption.textContent = option.textContent.trim();
+    newOption.value = option.firstElementChild.href;
+    newOption.selected = option.firstElementChild.classList.contains('active');
+    selectElement.appendChild(newOption);
+  });
+}
+
+// Function to handle select element change event
+function handleSelectChange(event) {
+  window.location.href = event.target.value;
+}
+
+// Function to replace the main options with the new select element
+function replaceMainOptionsWithSelect(mainOptions, selectElement) {
+  const divElement = document.createElement('div');
+  divElement.style.cssText = 'display:inline-block;width:auto;';
+  divElement.appendChild(selectElement);
+  mainOptions.parentNode.replaceChild(divElement, mainOptions);
+}
+
+// Function to hide the scroll element
+function hideScrollElement() {
+  const scrollElement = document.querySelector('.scroll');
+  if (scrollElement) scrollElement.style.display = 'none';
+}
