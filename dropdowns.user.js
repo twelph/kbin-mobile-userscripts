@@ -1,25 +1,39 @@
 let originalState = {};
 
+function getModSettings(namespace) {}
+
 function init() {
-  const mainOptions = document.querySelector('.options__main');
-  if (!mainOptions) return;
+  const settings = getModSettings("dropdowns");
 
-  originalState = { ...originalState, mainOptions: mainOptions.cloneNode(true) };
+  if (settings.filter) {
+    const mainOptions = document.querySelector(".options__main");
+    if (!mainOptions) return;
 
-  const select = createSelect(mainOptions);
-  replaceOptions(mainOptions, select);
+    originalState = {
+      ...originalState,
+      mainOptions: mainOptions.cloneNode(true),
+    };
 
-  const scrollElement = document.querySelector('.scroll');
-  if (scrollElement) {
-    originalState = { ...originalState, scrollDisplay: scrollElement.style.display };
+    const select = createSelect(mainOptions);
+    replaceOptions(mainOptions, select);
   }
 
-  hideScroll();
+  if (settings.view) {
+    const scrollElement = document.querySelector(".scroll");
+    if (scrollElement) {
+      originalState = {
+        ...originalState,
+        scrollDisplay: scrollElement.style.display,
+      };
+    }
+
+    hideScroll();
+  }
 }
 
 function teardown() {
-  const mainOptions = document.querySelector('.options__main');
-  const scrollElement = document.querySelector('.scroll');
+  const mainOptions = document.querySelector(".options__main");
+  const scrollElement = document.querySelector(".scroll");
 
   if (mainOptions && originalState.mainOptions) {
     mainOptions.parentNode.replaceChild(originalState.mainOptions, mainOptions);
@@ -33,8 +47,8 @@ function teardown() {
 function createSelect(mainOptions) {
   const parentStyles = getComputedStyle(mainOptions.parentElement);
 
-  const select = document.createElement('select');
-  select.className = 'options__main dropdown';
+  const select = document.createElement("select");
+  select.className = "options__main dropdown";
   select.style.cssText = `border:none;background-color:${parentStyles.backgroundColor};color:${parentStyles.color};`;
 
   addDefaultOption(select);
@@ -46,45 +60,49 @@ function createSelect(mainOptions) {
 }
 
 function addDefaultOption(select) {
-  const defaultOption = document.createElement('option');
-  defaultOption.textContent = 'Select';
-  defaultOption.value = '';
+  const defaultOption = document.createElement("option");
+  defaultOption.textContent = "Select";
+  defaultOption.value = "";
   defaultOption.selected = true;
   select.appendChild(defaultOption);
 }
 
 function addOptions(mainOptions, select) {
   Array.from(mainOptions.children).forEach((option) => {
-    const newOption = document.createElement('option');
+    const newOption = document.createElement("option");
     newOption.textContent = option.textContent.trim();
     newOption.value = option.firstElementChild.href;
-    newOption.selected = option.firstElementChild.classList.contains('active');
+    newOption.selected = option.firstElementChild.classList.contains("active");
     select.appendChild(newOption);
   });
 }
 
 function handleSelectChange(event) {
-  if (event.target.value !== '') {
+  if (event.target.value !== "") {
     window.location.href = event.target.value;
   }
 }
 
 function replaceOptions(mainOptions, select) {
-  const divElement = document.createElement('div');
-  divElement.style.cssText = 'display:inline-block;width:auto;';
+  const divElement = document.createElement("div");
+  divElement.style.cssText = "display:inline-block;width:auto;";
   divElement.appendChild(select);
   mainOptions.parentNode.replaceChild(divElement, mainOptions);
 }
 
 function hideScroll() {
-  const scrollElement = document.querySelector('.scroll');
+  const scrollElement = document.querySelector(".scroll");
   if (scrollElement) {
-    scrollElement.style.display = 'none';
+    scrollElement.style.display = "none";
   }
 }
 
 function dropdownsInit(toggle) {
-  return toggle ? init() : teardown();
+  if (toggle) {
+    init();
+  } else {
+    teardown();
+  }
 }
 
 window.dropdownsInit = dropdownsInit;
