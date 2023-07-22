@@ -1,20 +1,4 @@
-// ==UserScript==
-// @name         Dropdown modifier
-// @namespace    dropdowns
-// @version      0.2
-// @description  "A script to modify dropdown menus and hide scroll elements based on user settings.",
-// @author       twelph
-// @match        https://kbin.social/*
-// @license      MIT
-// ==/UserScript==
-
-(function() {
-  'use strict';
-  let originalState = {};
-
-  window.addEventListener('load', function() {
-    mobileDropdownsInit(true);
-  });
+let originalState = {};
 
 function init() {
   const settings = getModSettings('mobileDropdowns');
@@ -22,9 +6,10 @@ function init() {
   if (settings.filter) {
     const mainOptions = document.querySelector('.options__main');
     if (!mainOptions) return;
-
-    originalState = { ...originalState, mainOptions: mainOptions.cloneNode(true) };
-
+    originalState = {
+      ...originalState,
+      mainOptions: mainOptions.cloneNode(true),
+    };
     const select = createSelect(mainOptions);
     replaceOptions(mainOptions, select);
   }
@@ -32,7 +17,10 @@ function init() {
   if (settings.view) {
     const scrollElement = document.querySelector('.scroll');
     if (scrollElement) {
-      originalState = { ...originalState, scrollDisplay: scrollElement.style.display };
+      originalState = {
+        ...originalState,
+        scrollDisplay: scrollElement.style.display,
+      };
     }
 
     hideScroll();
@@ -42,7 +30,6 @@ function init() {
 function teardown() {
   const mainOptions = document.querySelector('.options__main');
   const scrollElement = document.querySelector('.scroll');
-
   if (mainOptions && originalState.mainOptions) {
     mainOptions.parentNode.replaceChild(originalState.mainOptions, mainOptions);
   }
@@ -54,16 +41,12 @@ function teardown() {
 
 function createSelect(mainOptions) {
   const parentStyles = getComputedStyle(mainOptions.parentElement);
-
   const select = document.createElement('select');
   select.className = 'options__main dropdown';
   select.style.cssText = `border:1px solid #000;background-color:${parentStyles.backgroundColor};color:${parentStyles.color};`;
-
   addDefaultOption(select);
   addOptions(mainOptions, select);
-
   select.onchange = handleSelectChange;
-
   return select;
 }
 
@@ -76,7 +59,6 @@ function addDefaultOption(select) {
   defaultOption.hidden = true;
   select.appendChild(defaultOption);
 }
-
 
 function addOptions(mainOptions, select) {
   Array.from(mainOptions.children).forEach((option) => {
@@ -108,17 +90,12 @@ function hideScroll() {
   }
 }
 
-  function mobileDropdownsInit(toggle) {
-    if (toggle) {
-      init();
-    } else {
-      teardown();
-    }
+function mobileDropdownsInit(toggle) {
+  if (toggle) {
+    init();
+  } else {
+    teardown();
   }
+}
 
-  window.mobileDropdownsInit = mobileDropdownsInit;
-
-  function getModSettings(settingName) {
-    return { filter: true, view: true }; // Hard-coded settings
-  }
-})();
+window.mobileDropdownsInit = mobileDropdownsInit;
