@@ -2,17 +2,31 @@
     "name": "Dropdown Modifier",
     "author": "Twelph",
     "version": "0.1",
-    "label": "Modify dropdowns and scroll behavior",
+    "label": "turn menus to dropdowns",
     "desc": "A script to modify dropdown menus and hide scroll elements based on user settings.",
     "login": false,
     "recurs": true,
     "entrypoint": "dropdownsInit",
     "namespace": "dropdowns",
-    "page": "general"
+    "page": "general",
     "fields": [
-        {
-            "type": "checkbox",
-            "initial": true,
-            "key": "filter",
-            "label": "Enable dropdown modification"
-          
+      {
+        "type": "checkbox",
+        "initial": true,
+        "key": "filter",
+        "label": "Enable dropdown modification"
+      },
+      {
+        "type": "checkbox",
+        "initial": true,
+        "key": "profiles",
+        "label": "Enable https://kbin.social/people"
+      },
+      {
+        "type": "checkbox",
+        "initial": true,
+        "key": "Threads/Comments",
+        "label": "Enable https://kbin.social/m/"
+      }
+    ]
+  }
