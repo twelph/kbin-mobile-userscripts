@@ -5,7 +5,7 @@
       "version": "0.1",
       "label": "Username Modifier",
       "desc": "Modifies usernames on kbin.social",
-      "login": false,
+      "login": true,
       "recurs": true,
       "entrypoint": "UsernameModifier.entryPoint",
       "page": "mobile",
