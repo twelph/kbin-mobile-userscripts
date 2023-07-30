@@ -1,0 +1,22 @@
+[
+    {
+      "name": "Username Modifier",
+      "author": "Twelph",
+      "version": "0.1",
+      "label": "Username Modifier",
+      "desc": "Modifies usernames on kbin.social",
+      "login": false,
+      "recurs": true,
+      "entrypoint": "UsernameModifier.entryPoint",
+      "page": "mobile",
+      "fields": [
+        {
+          "type": "checkbox",
+          "initial": true,
+          "key": "toggle",
+          "label": "Shorten Username"
+        }
+      ]
+    }
+  ]
+  
