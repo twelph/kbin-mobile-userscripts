@@ -1,4 +1,4 @@
-const UsernameModifier = {
+const usernameModifier = {
   originalState: new Map(),
 
   transformUsername: function (usernameElement) {
@@ -15,12 +15,14 @@ const UsernameModifier = {
     }
   },
 
-  applyToAll: function () {
-    const usernameElements = document.querySelectorAll('.user-name');
-    usernameElements.forEach((element) => this.transformUsername(element));
+  applyToFirst: function () {
+    const usernameElement = document.querySelector('.user-name');
+    if (usernameElement) {
+      this.transformUsername(usernameElement);
+    }
   },
 
-  revertAll: function () {
+  revert: function () {
     this.originalState.forEach((originalUsername, usernameElement) => {
       this.revertUsername(usernameElement);
     });
@@ -28,11 +30,11 @@ const UsernameModifier = {
 
   entryPoint: function (toggle) {
     if (toggle) {
-      this.applyToAll();
+      this.applyToFirst();
     } else {
-      this.revertAll();
+      this.revert();
     }
   }
 };
 
-UsernameModifier.entryPoint(true);
+usernameModifier.entryPoint(true);
