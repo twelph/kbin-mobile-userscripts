@@ -23,9 +23,10 @@ const usernameModifier = {
   },
 
   revert: function () {
-    this.originalState.forEach((originalUsername, usernameElement) => {
+    const usernameElement = [...this.originalState.keys()][0];
+    if (usernameElement) {
       this.revertUsername(usernameElement);
-    });
+    }
   },
 
   entryPoint: function (toggle) {
